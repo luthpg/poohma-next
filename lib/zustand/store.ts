@@ -55,9 +55,6 @@ export const initializeAuthListener = () => {
   console.log('initializeAuthListener: 開始'); // デバッグ用ログ
 
   // 1. 初期セッションチェック:
-  //    コンポーネントマウント時に現在のセッションを一度取得し、Zustandストアを初期化します。
-  //    これにより、onAuthStateChangeイベントが即座に発火しない場合でも、
-  //    正確な認証状態が設定されることを保証します。
   supabase.auth
     .getSession()
     .then(({ data: { session } }) => {
@@ -84,8 +81,9 @@ export const initializeAuthListener = () => {
     });
 
   // 2. 将来の認証状態変化を購読:
-  //    ログイン、ログアウト、トークン更新などのイベントをリッスンし、Zustandストアを更新します。
-  supabase.auth.onAuthStateChange((event, session) => {
+  const {
+    data: { subscription },
+  } = supabase.auth.onAuthStateChange((event, session) => {
     console.log('onAuthStateChange event:', event, session); // デバッグ用ログ
     if (session) {
       setAuthStatus('authenticated');
@@ -97,4 +95,10 @@ export const initializeAuthListener = () => {
     }
     console.log('onAuthStateChange event: authStatusを更新完了'); // デバッグ用ログ
   });
+
+  // onAuthStateChangeの購読を解除するためのクリーンアップ関数を返す
+  return () => {
+    console.log('onAuthStateChange subscription unsubscribed.'); // デバッグ用ログ
+    subscription.unsubscribe();
+  };
 };

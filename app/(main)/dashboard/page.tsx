@@ -39,7 +39,6 @@ export default function DashboardPage() {
         <p className='p-4'>ログインしていません。</p>
       )}
 
-      {/* shadcn/uiのModeToggleコンポーネントを配置 */}
       <div className='m-4'>
         <ModeToggle />
         <Button onClick={() => signOut()}>ログアウト</Button>

@@ -4,6 +4,17 @@
 //    必要に応じて、これらの型を拡張またはOmit/Pickで調整します。
 // ============================================================================
 
+import type {
+  Account,
+  AccountLoginId,
+  AccountPasswordHint,
+  Family,
+  FamilyMember,
+  Invitation,
+  Tag,
+  User,
+} from '@prisma/client';
+
 export type {
   Account,
   AccountLoginId,
@@ -84,14 +95,10 @@ export interface FamilyApiResponse extends Family {
 //    @/crypto/client.ts からインポートして再エクスポートする
 // ============================================================================
 
-import type {
+export type {
   EncryptedData,
   EncryptedDekForUser,
-  ExportedKeyPair,
-  KeyPair,
 } from '@/crypto/client';
-
-export type { EncryptedData, EncryptedDekForUser, KeyPair, ExportedKeyPair };
 
 // ============================================================================
 // 4. Utility Types (その他の共通ユーティリティ型)
