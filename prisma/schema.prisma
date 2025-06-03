@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Account {
+  id                  String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String
+  description         String?
+  sharedWithFamily    Boolean               @default(false)
+  ownerUserId         String                @db.Uuid
+  familyId            String?               @db.Uuid
+  createdAt           DateTime              @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime              @default(now()) @db.Timestamptz(6)
+  url                 String?
+  Family              Family?               @relation(fields: [familyId], references: [id], onUpdate: NoAction)
+  User                User                  @relation(fields: [ownerUserId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  AccountLoginId      AccountLoginId[]
+  AccountPasswordHint AccountPasswordHint[]
+  AccountTag          AccountTag[]
+
+  @@index([familyId])
+  @@index([ownerUserId])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model AccountLoginId {
+  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  accountId String  @db.Uuid
+  loginId   String
+  Account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([accountId])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model AccountPasswordHint {
+  id                       String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  accountId                String                     @db.Uuid
+  encryptedHint            String
+  createdAt                DateTime                   @default(now()) @db.Timestamptz(6)
+  updatedAt                DateTime                   @default(now()) @db.Timestamptz(6)
+  Account                  Account                    @relation(fields: [accountId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  PasswordHintEncryptedDek PasswordHintEncryptedDek[]
+
+  @@index([accountId])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model AccountTag {
+  accountId String  @db.Uuid
+  tagId     String  @db.Uuid
+  Account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  Tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([accountId, tagId])
+  @@index([accountId])
+  @@index([tagId])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Family {
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String
+  ownerUserId  String         @db.Uuid
+  createdAt    DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime       @default(now()) @db.Timestamptz(6)
+  Account      Account[]
+  User         User           @relation(fields: [ownerUserId], references: [id], onUpdate: NoAction)
+  FamilyMember FamilyMember[]
+  Invitation   Invitation[]
+
+  @@index([ownerUserId])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model FamilyMember {
+  familyId String   @db.Uuid
+  userId   String   @db.Uuid
+  joinedAt DateTime @default(now()) @db.Timestamptz(6)
+  Family   Family   @relation(fields: [familyId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  User     User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([familyId, userId])
+  @@index([familyId])
+  @@index([userId])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Invitation {
+  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  familyId        String           @db.Uuid
+  invitedByUserId String           @db.Uuid
+  inviteeEmail    String?
+  token           String           @unique
+  status          InvitationStatus @default(PENDING)
+  expiresAt       DateTime         @db.Timestamptz(6)
+  createdAt       DateTime         @default(now()) @db.Timestamptz(6)
+  Family          Family           @relation(fields: [familyId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  User            User             @relation(fields: [invitedByUserId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([familyId])
+  @@index([invitedByUserId])
+  @@index([token])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model PasswordHintEncryptedDek {
+  id                    String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  accountPasswordHintId String              @db.Uuid
+  userId                String              @db.Uuid
+  encryptedDekForUser   String
+  createdAt             DateTime            @default(now()) @db.Timestamptz(6)
+  AccountPasswordHint   AccountPasswordHint @relation(fields: [accountPasswordHintId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  User                  User                @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([accountPasswordHintId])
+  @@index([userId])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Tag {
+  id         String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name       String
+  userId     String       @db.Uuid
+  createdAt  DateTime     @default(now()) @db.Timestamptz(6)
+  AccountTag AccountTag[]
+  User       User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([name, userId])
+  @@index([userId])
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model User {
+  id                       String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email                    String?                    @unique
+  publicKey                String?
+  encryptedPrivateKey      String?
+  Account                  Account[]
+  Family                   Family[]
+  FamilyMember             FamilyMember[]
+  Invitation               Invitation[]
+  PasswordHintEncryptedDek PasswordHintEncryptedDek[]
+  Tag                      Tag[]
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  EXPIRED
+}
