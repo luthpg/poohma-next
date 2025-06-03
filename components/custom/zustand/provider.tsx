@@ -17,7 +17,6 @@ export function ZustandProvider({ children }: ChildrenProps) {
 
   useEffect(() => {
     if (!initialized.current) {
-      console.log('ZustandProvider: initializeAuthListenerを呼び出し');
       unsubscribeRef.current = initializeAuthListener();
       initialized.current = true;
     }

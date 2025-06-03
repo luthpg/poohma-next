@@ -1,13 +1,9 @@
-import { ModeToggle } from '@/components/mode-toggle';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 export default function HomePage() {
   return (
     <div className='min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-4'>
-      <div className='absolute top-4 right-4'>
-        <ModeToggle />
-      </div>
       <h1 className='text-5xl font-extrabold text-center mb-6'>Poohma</h1>
       <p className='text-xl text-center max-w-2xl mb-8'>
         あなたのすべてのアカウント情報を安全に、そして家族と共有できるパスワードヒント管理アプリ。

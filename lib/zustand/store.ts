@@ -52,13 +52,10 @@ export const initializeAuthListener = () => {
   const supabase = createClient();
   const { setAuthStatus, setUser, resetState } = useAppStore.getState();
 
-  console.log('initializeAuthListener: 開始'); // デバッグ用ログ
-
   // 1. 初期セッションチェック:
   supabase.auth
     .getSession()
     .then(({ data: { session } }) => {
-      console.log('initializeAuthListener: getSession結果:', session); // デバッグ用ログ
       if (session) {
         setAuthStatus('authenticated');
         setUser(session.user);
@@ -67,13 +64,8 @@ export const initializeAuthListener = () => {
         setUser(null);
         resetState();
       }
-      console.log('initializeAuthListener: authStatusを更新完了 (getSession)'); // デバッグ用ログ
     })
     .catch((error) => {
-      console.error(
-        'initializeAuthListener: Error fetching initial session:',
-        error,
-      ); // デバッグ用ログ
       // エラーが発生した場合も、未認証状態として扱う
       setAuthStatus('unauthenticated');
       setUser(null);
@@ -84,7 +76,6 @@ export const initializeAuthListener = () => {
   const {
     data: { subscription },
   } = supabase.auth.onAuthStateChange((event, session) => {
-    console.log('onAuthStateChange event:', event, session); // デバッグ用ログ
     if (session) {
       setAuthStatus('authenticated');
       setUser(session.user);
@@ -93,12 +84,10 @@ export const initializeAuthListener = () => {
       setUser(null);
       resetState();
     }
-    console.log('onAuthStateChange event: authStatusを更新完了'); // デバッグ用ログ
   });
 
   // onAuthStateChangeの購読を解除するためのクリーンアップ関数を返す
   return () => {
-    console.log('onAuthStateChange subscription unsubscribed.'); // デバッグ用ログ
     subscription.unsubscribe();
   };
 };
