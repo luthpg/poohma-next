@@ -1,8 +1,8 @@
-# Poohma アプリケーション構成案 (with Gemini)
+# PoohMa アプリケーション構成案 (with Gemini)
 
 ## 1. はじめに
 
-このドキュメントでは、アカウント情報管理アプリ「Poohma」の全体的なアーキテクチャと技術構成について提案します。
+このドキュメントでは、アカウント情報管理アプリ「PoohMa」の全体的なアーキテクチャと技術構成について提案します。
 Next.js (App Router)、Supabase、Prisma、Hono、Tailwind CSS、Shadcn/UI、Zustand、Tanstack Query、そして @t3-oss/env-nextjs を活用し、
 要件を満たすスケーラブルでメンテナンス性の高い、サーバーサイドレンダリング (SSR) を行うアプリケーションを目指します。
 

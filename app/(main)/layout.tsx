@@ -200,7 +200,7 @@ export default function MainLayout({ children }: ChildrenProps) {
             </SheetContent>
           </Sheet>
           <h1 className='text-xl font-bold text-indigo-600 dark:text-indigo-400'>
-            Poohma
+            PoohMa
           </h1>
           <ModeToggle />
         </header>

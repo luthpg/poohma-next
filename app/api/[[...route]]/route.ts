@@ -42,11 +42,11 @@ app.use('*', async (c, next) => {
   const supabase = await createClient();
 
   const {
-    data: { session },
+    data: { user },
     error: sessionError,
-  } = await supabase.auth.getSession();
+  } = await supabase.auth.getUser();
 
-  if (sessionError || !session) {
+  if (sessionError || !user) {
     c.status(401);
     return c.json({
       message: 'Unauthorized',
@@ -54,7 +54,7 @@ app.use('*', async (c, next) => {
     } as ApiErrorResponse);
   }
 
-  c.set('user', session.user);
+  c.set('user', user);
   c.set('supabase', supabase); // Supabaseクライアントもコンテキストに追加
 
   await next();

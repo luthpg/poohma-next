@@ -4,7 +4,7 @@ import Link from 'next/link';
 export default function HomePage() {
   return (
     <div className='min-h-screen flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white p-4'>
-      <h1 className='text-5xl font-extrabold text-center mb-6'>Poohma</h1>
+      <h1 className='text-5xl font-extrabold text-center mb-6'>PoohMa</h1>
       <p className='text-xl text-center max-w-2xl mb-8'>
         あなたのすべてのアカウント情報を安全に、そして家族と共有できるパスワードヒント管理アプリ。
       </p>
@@ -29,7 +29,7 @@ export default function HomePage() {
       </div>
 
       <div className='mt-12 text-center'>
-        <h3 className='text-2xl font-bold mb-4'>Poohmaの特長</h3>
+        <h3 className='text-2xl font-bold mb-4'>PoohMaの特長</h3>
         <ul className='list-disc list-inside text-lg space-y-2'>
           <li>
             <b>安全な暗号化</b>:
