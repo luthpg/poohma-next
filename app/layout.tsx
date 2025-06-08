@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Noto_Sans_JP } from 'next/font/google';
 import '@/app/globals.css';
+import { ThemeProvider } from '@/components/custom/common/theme-provider';
 import { ZustandProvider } from '@/components/custom/zustand/provider';
-import { ThemeProvider } from '@/components/theme-provider';
 
 const inter = Inter({ subsets: ['latin'] });
+const notoSansJp = Noto_Sans_JP({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'PoohMa - アカウント情報管理',
@@ -18,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='ja' suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${inter.className} ${notoSansJp.className}`}>
         <ThemeProvider
           attribute='class'
           defaultTheme='system'

@@ -1,30 +1,33 @@
 'use client';
 
-import { ModeToggle } from '@/components/mode-toggle';
-import { Button } from '@/components/ui/button';
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
+  AppSidebar,
+  type SidebarConfigs,
+} from '@/components/custom/common/app-sidebar';
+import { NavActions } from '@/components/custom/common/nav-actions';
+import { Separator } from '@/components/ui/separator';
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from '@/components/ui/sidebar';
 import type { ChildrenProps } from '@/lib/types';
-import { useAppStore } from '@/lib/zustand/store';
+import { initializeAuthListener, useAppStore } from '@/lib/zustand/store';
 import {
-  FolderOpen,
   Home,
   KeyRound,
   Loader2,
   LogOut,
+  MessageCircleQuestion,
+  Search,
   Settings,
-  Users,
+  UsersRound,
 } from 'lucide-react';
-import { MenuIcon } from 'lucide-react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { signOut } from './actions';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default function MainLayout({ children }: ChildrenProps) {
   const router = useRouter();
@@ -53,6 +56,61 @@ export default function MainLayout({ children }: ChildrenProps) {
       setGlobalError('ログアウトに失敗しました。');
       setGlobalLoading(false);
     }
+    initializeAuthListener();
+    redirect('/login');
+  };
+
+  const sidebarContents: SidebarConfigs = {
+    user: {
+      name: user?.user_metadata?.name ?? 'unknown user',
+      email: user?.email ?? 'user@example.com',
+      avatar: user?.user_metadata?.avatar_url,
+    },
+    userMenu: [
+      [
+        {
+          title: 'アカウント情報',
+          url: '/settings',
+          icon: Settings,
+        },
+        {
+          title: 'ログアウト',
+          icon: LogOut,
+          onClick: handleSignOut,
+        },
+      ],
+    ],
+    navMain: [
+      {
+        title: '検索',
+        icon: Search,
+        onClick: () => console.log('Search'),
+      },
+      {
+        title: 'ダッシュボード',
+        url: '/dashboard',
+        icon: Home,
+        isActive: true,
+      },
+      {
+        title: '家族管理',
+        url: '/family',
+        icon: UsersRound,
+      },
+    ],
+    navSecondary: [
+      {
+        title: '設定',
+        url: '/settings',
+        icon: Settings,
+      },
+      {
+        title: 'ヘルプ',
+        url: '/help',
+        icon: MessageCircleQuestion,
+      },
+    ],
+    favorites: [],
   };
 
   if (authStatus === 'loading') {
@@ -68,162 +126,48 @@ export default function MainLayout({ children }: ChildrenProps) {
   }
 
   if (authStatus === 'unauthenticated') {
-    return null;
+    return <span>unauthenticated</span>;
   }
 
   return (
-    <div className='flex min-h-screen bg-gray-50 dark:bg-gray-800'>
-      <aside className='hidden md:flex flex-col w-64 bg-white dark:bg-gray-900 shadow-md p-4 border-r dark:border-gray-700'>
-        <div className='flex items-center justify-between mb-8'>
-          <h1 className='text-2xl font-bold text-indigo-600 dark:text-indigo-400'>
-            PoohMa
-          </h1>
-          <ModeToggle />
-        </div>
-        <nav className='flex-1 space-y-2'>
-          <Link href='/dashboard' passHref>
-            <Button
-              variant='ghost'
-              className='w-full justify-start text-lg px-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700'
-            >
-              <Home className='mr-3 h-5 w-5' /> ダッシュボード
-            </Button>
-          </Link>
-          <Link href='/accounts' passHref>
-            <Button
-              variant='ghost'
-              className='w-full justify-start text-lg px-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700'
-            >
-              <FolderOpen className='mr-3 h-5 w-5' /> アカウント
-            </Button>
-          </Link>
-          <Link href='/family' passHref>
-            <Button
-              variant='ghost'
-              className='w-full justify-start text-lg px-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700'
-            >
-              <Users className='mr-3 h-5 w-5' /> 家族管理
-            </Button>
-          </Link>
-          <Link href='/settings' passHref>
-            <Button
-              variant='ghost'
-              className='w-full justify-start text-lg px-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700'
-            >
-              <Settings className='mr-3 h-5 w-5' /> 設定
-            </Button>
-          </Link>
-        </nav>
-        <div className='mt-auto pt-4 border-t dark:border-gray-700'>
-          {user && (
-            <p className='text-sm text-gray-600 dark:text-gray-400 mb-2 truncate'>
-              {user.email}
-            </p>
-          )}
-          <Button
-            onClick={handleSignOut}
-            variant='ghost'
-            className='w-full justify-start text-lg px-4 py-2 rounded-md hover:bg-red-100 dark:hover:bg-red-900 text-red-600 dark:text-red-400'
-          >
-            <LogOut className='mr-3 h-5 w-5' /> ログアウト
-          </Button>
-        </div>
-      </aside>
-
-      {/* メインコンテンツエリア */}
-      <main className='flex-1 flex flex-col'>
-        {/* モバイル用ヘッダー (モバイル用) */}
-        <header className='md:hidden flex items-center justify-between p-4 bg-white dark:bg-gray-900 shadow-sm border-b dark:border-gray-700'>
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant='ghost' size='icon'>
-                <MenuIcon className='h-6 w-6' />
-              </Button>
-            </SheetTrigger>
-            <SheetContent
-              side='left'
-              className='w-64 bg-white dark:bg-gray-900 p-4'
-            >
-              <SheetHeader>
-                <SheetTitle className='text-2xl font-bold text-indigo-600 dark:text-indigo-400'>
-                  PoohMa
-                </SheetTitle>
-              </SheetHeader>
-              <nav className='flex flex-col space-y-2 mt-8'>
-                <Link href='/dashboard' passHref>
-                  <Button
-                    variant='ghost'
-                    className='w-full justify-start text-lg px-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700'
-                  >
-                    <Home className='mr-3 h-5 w-5' /> ダッシュボード
-                  </Button>
-                </Link>
-                <Link href='/accounts' passHref>
-                  <Button
-                    variant='ghost'
-                    className='w-full justify-start text-lg px-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700'
-                  >
-                    <FolderOpen className='mr-3 h-5 w-5' /> アカウント
-                  </Button>
-                </Link>
-                <Link href='/family' passHref>
-                  <Button
-                    variant='ghost'
-                    className='w-full justify-start text-lg px-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700'
-                  >
-                    <Users className='mr-3 h-5 w-5' /> 家族管理
-                  </Button>
-                </Link>
-                <Link href='/settings' passHref>
-                  <Button
-                    variant='ghost'
-                    className='w-full justify-start text-lg px-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700'
-                  >
-                    <Settings className='mr-3 h-5 w-5' /> 設定
-                  </Button>
-                </Link>
-              </nav>
-              <div className='mt-auto pt-4 border-t dark:border-gray-700'>
-                {user && (
-                  <p className='text-sm text-gray-600 dark:text-gray-400 mb-2 truncate'>
-                    {user.email}
-                  </p>
-                )}
-                <Button
-                  onClick={handleSignOut}
-                  variant='ghost'
-                  className='w-full justify-start text-lg px-4 py-2 rounded-md hover:bg-red-100 dark:hover:bg-red-900 text-red-600 dark:text-red-400'
-                >
-                  <LogOut className='mr-3 h-5 w-5' /> ログアウト
-                </Button>
-              </div>
-            </SheetContent>
-          </Sheet>
-          <h1 className='text-xl font-bold text-indigo-600 dark:text-indigo-400'>
-            PoohMa
-          </h1>
-          <ModeToggle />
-        </header>
-
-        {!isPrivateKeyLoaded && (
-          <div className='bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 p-3 text-center text-sm font-medium flex items-center justify-center gap-2'>
-            <KeyRound className='h-4 w-4' />
-            <span>
-              パスワード復号キーがロードされていません。設定ページでマスターパスワードを入力してください。
-            </span>
-            <Link href='/settings' passHref>
-              <Button
-                variant='link'
-                className='text-yellow-800 dark:text-yellow-200 p-0 h-auto underline'
-              >
-                設定へ
-              </Button>
-            </Link>
+    <SidebarProvider>
+      <AppSidebar contents={sidebarContents} />
+      <SidebarInset>
+        <header className='flex h-14 shrink-0 items-center gap-2 sticky top-0 bg-background'>
+          <div className='flex flex-1 items-center gap-2 px-3'>
+            <SidebarTrigger />
+            <Separator
+              orientation='vertical'
+              className='mr-2 data-[orientation=vertical]:h-4'
+            />
+            <h1 className='font-bold text-primary'>
+              <Link href='/'>PoohMa</Link>
+            </h1>
           </div>
-        )}
-
-        <div className='flex-1 overflow-auto'>{children}</div>
-      </main>
-    </div>
+          <div className='ml-auto px-3'>
+            <NavActions />
+          </div>
+        </header>
+        <main className='flex-1 flex flex-col'>
+          {!isPrivateKeyLoaded && (
+            <div className='bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 p-3 text-center text-sm font-medium flex items-center justify-center gap-2'>
+              <KeyRound className='h-4 w-4' />
+              <span>
+                パスワード復号キーがロードされていません。設定ページでマスターパスワードを入力してください。
+              </span>
+              <Link href='/settings' passHref>
+                <Button
+                  variant='link'
+                  className='text-yellow-800 dark:text-yellow-200 p-0 h-auto underline'
+                >
+                  設定へ
+                </Button>
+              </Link>
+            </div>
+          )}
+          <div className='flex-1 overflow-auto'>{children}</div>
+        </main>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
