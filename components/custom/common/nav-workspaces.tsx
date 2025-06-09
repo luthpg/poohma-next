@@ -18,17 +18,20 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 
+export interface NavWorkspacesItem {
+  name: string;
+  emoji: React.ReactNode;
+  pages: {
+    name: string;
+    emoji: React.ReactNode;
+  }[];
+}
+
 export function NavWorkspaces({
   workspaces,
 }: {
-  workspaces: {
-    name: string;
-    emoji: React.ReactNode;
-    pages: {
-      name: string;
-      emoji: React.ReactNode;
-    }[];
-  }[];
+  workspaces: NavWorkspacesItem[];
+  onItemClick: () => void | Promise<void>;
 }) {
   return (
     <SidebarGroup>

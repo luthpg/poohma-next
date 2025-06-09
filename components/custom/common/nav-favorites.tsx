@@ -24,14 +24,18 @@ import {
   Trash2,
 } from 'lucide-react';
 
+export interface NavFavoritesItem {
+  name: string;
+  url: string;
+  emoji: string;
+}
+
 export function NavFavorites({
   favorites,
+  // onItemClick,
 }: {
-  favorites: {
-    name: string;
-    url: string;
-    emoji: string;
-  }[];
+  favorites: NavFavoritesItem[];
+  onItemClick: () => void | Promise<void>;
 }) {
   const { isMobile } = useSidebar();
 

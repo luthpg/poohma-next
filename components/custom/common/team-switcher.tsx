@@ -17,14 +17,16 @@ import {
 import { ChevronDown, Plus } from 'lucide-react';
 import * as React from 'react';
 
+export interface TeamSwitcherItem {
+  name: string;
+  logo: React.ElementType;
+  plan: string;
+}
+
 export function TeamSwitcher({
   teams,
 }: {
-  teams: {
-    name: string;
-    logo: React.ElementType;
-    plan: string;
-  }[];
+  teams: TeamSwitcherItem[];
 }) {
   const [activeTeam, setActiveTeam] = React.useState(teams[0]);
 

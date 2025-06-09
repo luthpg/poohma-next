@@ -55,6 +55,10 @@ export async function signInWithGoogle() {
     provider: 'google',
     options: {
       redirectTo: `${env.NEXT_PUBLIC_APP_BASE_URL}/auth/callback`,
+      queryParams: {
+        access_type: 'offline',
+        prompt: 'consent',
+      },
     },
   });
 

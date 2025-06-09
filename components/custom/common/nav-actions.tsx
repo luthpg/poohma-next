@@ -15,70 +15,18 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import {
-  ArrowDown,
-  ArrowUp,
-  Bell,
-  Copy,
-  CornerUpRight,
-  GalleryVerticalEnd,
-  Link,
-  MoreHorizontal,
-  Star,
-  Trash2,
-} from 'lucide-react';
+import { type LucideIcon, MoreHorizontal, Star } from 'lucide-react';
 import * as React from 'react';
 
-interface SidebarGroupContentType {
+export interface SidebarGroupContentType {
   label: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   onClick?: (
     event: React.MouseEvent<HTMLButtonElement>,
   ) => void | Promise<void>;
 }
 
-const data: SidebarGroupContentType[][] = [
-  [
-    {
-      label: 'リンクをコピー',
-      icon: Link,
-    },
-    {
-      label: 'コピーして新規作成',
-      icon: Copy,
-    },
-    {
-      label: 'レコードを移動',
-      icon: CornerUpRight,
-    },
-    {
-      label: 'レコードを削除',
-      icon: Trash2,
-    },
-  ],
-  [
-    {
-      label: 'バージョン履歴',
-      icon: GalleryVerticalEnd,
-    },
-    {
-      label: 'アプリからのお知らせ',
-      icon: Bell,
-    },
-  ],
-  [
-    {
-      label: 'インポート',
-      icon: ArrowUp,
-    },
-    {
-      label: 'エクスポート',
-      icon: ArrowDown,
-    },
-  ],
-];
-
-export function NavActions() {
+export function NavActions({ data }: { data: SidebarGroupContentType[][] }) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (

@@ -9,6 +9,7 @@ interface AppState {
   isPrivateKeyLoaded: boolean;
   globalError: string | null;
   globalLoading: boolean;
+  sidebarOpen: boolean;
 }
 
 interface AppActions {
@@ -17,6 +18,7 @@ interface AppActions {
   setPrivateKeyLoaded: (loaded: boolean) => void;
   setGlobalError: (error: string | null) => void;
   setGlobalLoading: (loading: boolean) => void;
+  setSidebarOpen: (open: boolean) => void;
   resetState: () => void;
 }
 
@@ -26,6 +28,7 @@ const initialState: AppState = {
   isPrivateKeyLoaded: false,
   globalError: null,
   globalLoading: false,
+  sidebarOpen: true,
 };
 
 export const useAppStore = create<AppState & AppActions>()(
@@ -37,6 +40,10 @@ export const useAppStore = create<AppState & AppActions>()(
       setPrivateKeyLoaded: (loaded) => set({ isPrivateKeyLoaded: loaded }),
       setGlobalError: (error) => set({ globalError: error }),
       setGlobalLoading: (loading) => set({ globalLoading: loading }),
+      setSidebarOpen: (open) => {
+        console.log('called! setSidebarOpen', open);
+        return set({ sidebarOpen: open });
+      },
       resetState: () => set(initialState),
     }),
     {

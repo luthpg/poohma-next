@@ -1,6 +1,5 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,29 +15,32 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar';
-import {
-  ChevronsUpDown,
-  type LucideIcon,
-} from 'lucide-react';
+import { ChevronsUpDown, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
+import { CurrentUserAvatar } from './current-user-avatar';
+
+export interface NavUserItem {
+  name: string;
+  email: string;
+  avatar: string;
+}
+export interface NavUserMenuItem {
+  title: string;
+  icon: LucideIcon;
+  url?: string;
+  onClick?: (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => void | Promise<void>;
+}
 
 export function NavUser({
   user,
   userMenuContents,
+  onItemClick,
 }: {
-  user: {
-    name: string;
-    email: string;
-    avatar: string;
-  };
-  userMenuContents: {
-    title: string;
-    icon: LucideIcon;
-    url?: string;
-    onClick?: (
-      event: React.MouseEvent<HTMLButtonElement>,
-    ) => void | Promise<void>;
-  }[][];
+  user: NavUserItem;
+  userMenuContents: NavUserMenuItem[][];
+  onItemClick: () => void | Promise<void>;
 }) {
   const { isMobile } = useSidebar();
 
@@ -51,10 +53,7 @@ export function NavUser({
               size='lg'
               className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
             >
-              <Avatar className='h-8 w-8 rounded-lg'>
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className='rounded-lg'>CN</AvatarFallback>
-              </Avatar>
+              <CurrentUserAvatar />
               <div className='grid flex-1 text-left text-sm leading-tight'>
                 <span className='truncate font-medium'>{user.name}</span>
                 <span className='truncate text-xs'>{user.email}</span>
@@ -79,6 +78,7 @@ export function NavUser({
                         <Link
                           href={item.url}
                           className='flex w-full items-center gap-2 overflow-hidden text-left outline-hidden'
+                          onClick={onItemClick}
                         >
                           <item.icon />
                           {item.title}
@@ -87,8 +87,11 @@ export function NavUser({
                         item.onClick != null && (
                           <button
                             type='button'
-                            onClick={item.onClick}
-                            className='flex w-full items-center gap-2 overflow-hidden text-left outline-hidden'
+                            onClick={async (event) => {
+                              item.onClick != null &&
+                                (await item.onClick(event));
+                              await onItemClick();
+                            }}
                           >
                             <item.icon />
                             {item.title}

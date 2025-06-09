@@ -4,7 +4,11 @@ import {
   AppSidebar,
   type SidebarConfigs,
 } from '@/components/custom/common/app-sidebar';
-import { NavActions } from '@/components/custom/common/nav-actions';
+import {
+  NavActions,
+  type SidebarGroupContentType,
+} from '@/components/custom/common/nav-actions';
+import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import {
   SidebarInset,
@@ -14,20 +18,30 @@ import {
 import type { ChildrenProps } from '@/lib/types';
 import { initializeAuthListener, useAppStore } from '@/lib/zustand/store';
 import {
+  ArrowDown,
+  ArrowUp,
+  Bell,
+  Copy,
+  CornerUpRight,
+  GalleryVerticalEnd,
   Home,
   KeyRound,
+  Link as LinkIcon,
   Loader2,
   LogOut,
   MessageCircleQuestion,
+  Moon,
   Search,
   Settings,
+  Sun,
+  Trash2,
   UsersRound,
 } from 'lucide-react';
+import { useTheme } from 'next-themes';
+import Link from 'next/link';
 import { redirect, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { signOut } from './actions';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 
 export default function MainLayout({ children }: ChildrenProps) {
   const router = useRouter();
@@ -37,7 +51,10 @@ export default function MainLayout({ children }: ChildrenProps) {
     isPrivateKeyLoaded,
     setGlobalError,
     setGlobalLoading,
+    sidebarOpen,
   } = useAppStore();
+  
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     if (authStatus === 'unauthenticated') {
@@ -60,7 +77,9 @@ export default function MainLayout({ children }: ChildrenProps) {
     redirect('/login');
   };
 
-  const sidebarContents: SidebarConfigs = {
+  const sidebarContents: SidebarConfigs & {
+    sidebarActions: SidebarGroupContentType[][];
+  } = {
     user: {
       name: user?.user_metadata?.name ?? 'unknown user',
       email: user?.email ?? 'user@example.com',
@@ -104,6 +123,17 @@ export default function MainLayout({ children }: ChildrenProps) {
         url: '/settings',
         icon: Settings,
       },
+      theme === 'dark'
+        ? {
+            title: 'ライトモード',
+            icon: Sun,
+            onClick: () => setTheme('light'),
+          }
+        : {
+            title: 'ダークモード',
+            icon: Moon,
+            onClick: () => setTheme('dark'),
+          },
       {
         title: 'ヘルプ',
         url: '/help',
@@ -111,6 +141,46 @@ export default function MainLayout({ children }: ChildrenProps) {
       },
     ],
     favorites: [],
+    sidebarActions: [
+      [
+        {
+          label: 'リンクをコピー',
+          icon: LinkIcon,
+        },
+        {
+          label: 'コピーして新規作成',
+          icon: Copy,
+        },
+        {
+          label: 'レコードを移動',
+          icon: CornerUpRight,
+        },
+        {
+          label: 'レコードを削除',
+          icon: Trash2,
+        },
+      ],
+      [
+        {
+          label: 'バージョン履歴',
+          icon: GalleryVerticalEnd,
+        },
+        {
+          label: 'アプリからのお知らせ',
+          icon: Bell,
+        },
+      ],
+      [
+        {
+          label: 'インポート',
+          icon: ArrowUp,
+        },
+        {
+          label: 'エクスポート',
+          icon: ArrowDown,
+        },
+      ],
+    ],
   };
 
   if (authStatus === 'loading') {
@@ -130,7 +200,7 @@ export default function MainLayout({ children }: ChildrenProps) {
   }
 
   return (
-    <SidebarProvider>
+    <SidebarProvider open={sidebarOpen}>
       <AppSidebar contents={sidebarContents} />
       <SidebarInset>
         <header className='flex h-14 shrink-0 items-center gap-2 sticky top-0 bg-background'>
@@ -145,7 +215,7 @@ export default function MainLayout({ children }: ChildrenProps) {
             </h1>
           </div>
           <div className='ml-auto px-3'>
-            <NavActions />
+            <NavActions data={sidebarContents.sidebarActions} />
           </div>
         </header>
         <main className='flex-1 flex flex-col'>

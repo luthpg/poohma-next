@@ -1,58 +1,68 @@
 'use client';
 
-import { NavFavorites } from '@/components/custom/common/nav-favorites';
-import { NavMain } from '@/components/custom/common/nav-main';
-import { NavSecondary } from '@/components/custom/common/nav-secondary';
-import { NavUser } from '@/components/custom/common/nav-user';
+import {
+  NavFavorites,
+  type NavFavoritesItem,
+} from '@/components/custom/common/nav-favorites';
+import { NavMain, type NavMainItem } from '@/components/custom/common/nav-main';
+import {
+  NavSecondary,
+  type NavSecondaryItem,
+} from '@/components/custom/common/nav-secondary';
+import {
+  NavUser,
+  type NavUserItem,
+  type NavUserMenuItem,
+} from '@/components/custom/common/nav-user';
 import {
   Sidebar,
   SidebarContent,
   SidebarHeader,
   SidebarRail,
 } from '@/components/ui/sidebar';
-import type { LucideIcon } from 'lucide-react';
-import type * as React from 'react';
+import { useAppStore } from '@/lib/zustand/store';
+import React from 'react';
 
 export interface SidebarConfigs {
-  user: { name: string; email: string; avatar: string };
-  userMenu: {
-    title: string;
-    url?: string | undefined;
-    onClick?:
-      | ((event: React.MouseEvent<HTMLButtonElement>) => void | Promise<void>)
-      | undefined;
-    icon: LucideIcon;
-  }[][];
-  navMain: {
-    title: string;
-    url?: string | undefined;
-    onClick?:
-      | ((event: React.MouseEvent<HTMLButtonElement>) => void | Promise<void>)
-      | undefined;
-    icon: LucideIcon;
-    isActive?: boolean | undefined;
-  }[];
-  navSecondary: {
-    title: string;
-    url: string;
-    icon: LucideIcon;
-    badge?: React.ReactNode;
-  }[];
-  favorites: { name: string; url: string; emoji: string }[];
+  user: NavUserItem;
+  userMenu: NavUserMenuItem[][];
+  navMain: NavMainItem[];
+  navSecondary: NavSecondaryItem[];
+  favorites: NavFavoritesItem[];
 }
+
 export function AppSidebar({
   contents,
   ...props
 }: { contents: SidebarConfigs } & React.ComponentProps<typeof Sidebar>) {
+  const setOpen = useAppStore((state) => state.setSidebarOpen);
+
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+  const handleItemClick = React.useCallback(() => {
+    if (isMobile) setOpen(false);
+  }, [isMobile, setOpen]);
+
   return (
     <Sidebar className='border-r-0' {...props}>
       <SidebarHeader>
-        <NavUser user={contents.user} userMenuContents={contents.userMenu} />
-        <NavMain items={contents.navMain} />
+        <NavUser
+          user={contents.user}
+          userMenuContents={contents.userMenu}
+          onItemClick={handleItemClick}
+        />
+        <NavMain items={contents.navMain} onItemClick={handleItemClick} />
       </SidebarHeader>
       <SidebarContent>
-        <NavFavorites favorites={contents.favorites} />
-        <NavSecondary items={contents.navSecondary} className='mt-auto' />
+        <NavFavorites
+          favorites={contents.favorites}
+          onItemClick={handleItemClick}
+        />
+        <NavSecondary
+          items={contents.navSecondary}
+          className='mt-auto'
+          onItemClick={handleItemClick}
+        />
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
